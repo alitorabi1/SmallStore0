@@ -1,148 +1,81 @@
-USE [store]
-GO
+CREATE TABLE [dbo].[OrderItem] (
+    [OrderId]          INT            NOT NULL,
+    [ProductId]        INT            NOT NULL,
+    [SalePricePerUnit] MONEY          NULL,
+    [NumberOfUnit]     DECIMAL (18)   NULL,
+    [ProductName]      NVARCHAR (250) NULL,
+    CONSTRAINT [PK_OrderItem] PRIMARY KEY CLUSTERED ([OrderId] ASC, [ProductId] ASC),
+    CONSTRAINT [FK_OrderIdd] FOREIGN KEY ([OrderId]) REFERENCES [dbo].[OrderSummary] ([OrderId]),
+    CONSTRAINT [FK_ProductIdd] FOREIGN KEY ([ProductId]) REFERENCES [dbo].[Product] ([ProductId])
+);
 
-/****** Object:  Table [dbo].[ProductCategory]    Script Date: 9/7/2016 1:10:36 PM ******/
-SET ANSI_NULLS ON
-GO
+CREATE TABLE [dbo].[OrderSummary] (
+    [OrderId]     INT           IDENTITY (1, 1) NOT NULL,
+    [EmployeeId]  INT           NOT NULL,
+    [CustomerId]  INT           NULL,
+    [DatePurches] DATETIME      NOT NULL,
+    [TotalPrice]  MONEY         NULL,
+    [Discount]    MONEY         NULL,
+    [Tax]         MONEY         NOT NULL,
+    [TotalAndTax] MONEY         NULL,
+    [PaidMethod]  NVARCHAR (80) NULL,
+    CONSTRAINT [PK_OrderSummary] PRIMARY KEY CLUSTERED ([OrderId] ASC),
+    CONSTRAINT [FK_CustomerId] FOREIGN KEY ([CustomerId]) REFERENCES [dbo].[Customer] ([CustomerId]),
+    CONSTRAINT [FK_EmployeeId] FOREIGN KEY ([EmployeeId]) REFERENCES [dbo].[Employee] ([EmployeeId])
+);
 
-SET QUOTED_IDENTIFIER ON
-GO
+CREATE TABLE [dbo].[Product] (
+    [ProductId]     INT            IDENTITY (1, 1) NOT NULL,
+    [ProductName]   NVARCHAR (250) NOT NULL,
+    [CategoryId]    INT            NOT NULL,
+    [Barcode]       VARCHAR (30)   NULL,
+    [NumberInStock] INT            NOT NULL,
+    [PurchasePrice] MONEY          NULL,
+    [SalePrice]     MONEY          NULL,
+    [Unit]          NVARCHAR (100) NULL,
+    CONSTRAINT [PK_Product] PRIMARY KEY CLUSTERED ([ProductId] ASC),
+    CONSTRAINT [FK_CategoryId] FOREIGN KEY ([CategoryId]) REFERENCES [dbo].[ProductCategory] ([CategoryId])
+);
 
-CREATE TABLE [dbo].[ProductCategory](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[Name] [nvarchar](80) NOT NULL,
- CONSTRAINT [PK_ProductCategory] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+CREATE TABLE [dbo].[Customer] (
+    [CustomerId]         INT            IDENTITY (1, 1) NOT NULL,
+    [FirstName]          NVARCHAR (100) NULL,
+    [LastName]           NCHAR (10)     NULL,
+    [Phone]              INT            NULL,
+    [CellPhone]          INT            NULL,
+    [Address]            NVARCHAR (MAX) NULL,
+    [PostalCode]         NVARCHAR (50)  NULL,
+    [DiscountPercentage] DECIMAL (18)   NULL,
+    [RegisterDate]       DATETIME       NULL,
+    [ModifyDate]         DATETIME       NULL,
+    PRIMARY KEY CLUSTERED ([CustomerId] ASC)
+);
 
-GO
+CREATE TABLE [dbo].[Employee] (
+    [EmployeeId]  INT            IDENTITY (1, 1) NOT NULL,
+    [FirstName]   NVARCHAR (100) NULL,
+    [LastName]    NCHAR (10)     NULL,
+    [Phone]       INT            NULL,
+    [CellPhone]   INT            NULL,
+    [Address]     NVARCHAR (MAX) NULL,
+    [PostalCode]  NVARCHAR (50)  NULL,
+    [BirthDate]   DATETIME       NULL,
+    [JobTitle]    NVARCHAR (50)  NULL,
+    [HireDate]    DATETIME       NULL,
+    [FireDate]    DATETIME       NULL,
+    [Salary]      MONEY          NULL,
+    [IsPermenant] BIT            NULL,
+    [IsManager]   BIT            NULL,
+    [UserName]    NVARCHAR (50)  NULL,
+    [Password]    NVARCHAR (15)  NULL,
+    PRIMARY KEY CLUSTERED ([EmployeeId] ASC),
+    UNIQUE NONCLUSTERED ([UserName] ASC)
+);
 
-
-
-
-
-
-USE [store]
-GO
-
-/****** Object:  Table [dbo].[Product]    Script Date: 9/7/2016 1:12:17 PM ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
-SET ANSI_PADDING ON
-GO
-
-CREATE TABLE [dbo].[Product](
-	[ProductId] [int] IDENTITY(1,1) NOT NULL,
-	[ProductName] [nvarchar](250) NOT NULL,
-	[CategoryId] [int] NOT NULL,
-	[Barcode] [varchar](30) NULL,
-	[NumberInStock] [int] NOT NULL,
-	[PurchasePrice] [decimal](19, 4) NULL,
-	[SalePrice] [decimal](19, 4) NULL,
-	[Unit] [nvarchar](100) NULL,
- CONSTRAINT [PK_Product] PRIMARY KEY CLUSTERED 
-(
-	[ProductId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-
-GO
-
-SET ANSI_PADDING OFF
-GO
-
-
-USE [store]
-GO
-
-/****** Object:  Table [dbo].[OrderSummary]    Script Date: 9/7/2016 1:12:40 PM ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE TABLE [dbo].[OrderSummary](
-	[OrderId] [int] IDENTITY(1,1) NOT NULL,
-	[EmployeeId] [int] NOT NULL,
-	[CustomerId] [int] NULL,
-	[DatePurches] [datetime] NOT NULL,
-	[TotalPrice] [money] NULL,
-	[Discount] [money] NULL,
-	[Tax] [money] NOT NULL,
-	[TotalAndTax] [money] NULL,
-	[PaidMethod] [nvarchar](50) NULL,
- CONSTRAINT [PK_OrderSummary] PRIMARY KEY CLUSTERED 
-(
-	[OrderId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-
-GO
-
-ALTER TABLE [dbo].[OrderSummary] ADD  CONSTRAINT [DF_OrderSummary_TotalPrice]  DEFAULT ((0)) FOR [TotalPrice]
-GO
-
-ALTER TABLE [dbo].[OrderSummary] ADD  CONSTRAINT [DF_OrderSummary_Discount]  DEFAULT ((0)) FOR [Discount]
-GO
-
-
-
-USE [store]
-GO
-
-/****** Object:  Table [dbo].[OrderDetails]    Script Date: 9/7/2016 1:13:05 PM ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE TABLE [dbo].[OrderDetails](
-	[OrderId] [int] NOT NULL,
-	[ProductName] [nvarchar](250) NOT NULL,
-	[SalePricePerUnit] [money] NULL,
-	[NumberOfUnit] [decimal](18, 0) NULL,
- CONSTRAINT [PK_OrderDetails] PRIMARY KEY CLUSTERED 
-(
-	[OrderId] ASC,
-	[ProductName] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-
-GO
-
-
-USE [store]
-GO
-
-/****** Object:  Table [dbo].[OrderDetails]    Script Date: 9/7/2016 1:13:05 PM ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE TABLE [dbo].[OrderDetails](
-	[OrderId] [int] NOT NULL,
-	[ProductName] [nvarchar](250) NOT NULL,
-	[SalePricePerUnit] [money] NULL,
-	[NumberOfUnit] [decimal](18, 0) NULL,
- CONSTRAINT [PK_OrderDetails] PRIMARY KEY CLUSTERED 
-(
-	[OrderId] ASC,
-	[ProductName] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-
-GO
-
-
-
+CREATE TABLE [dbo].[ProductCategory] (
+    [CategoryId] INT           IDENTITY (1, 1) NOT NULL,
+    [Category]   NVARCHAR (80) NOT NULL,
+    CONSTRAINT [PK_ProductCategory] PRIMARY KEY CLUSTERED ([CategoryId] ASC),
+    UNIQUE NONCLUSTERED ([Category] ASC)
+);
 
